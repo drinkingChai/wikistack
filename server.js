@@ -2,6 +2,9 @@ const express = require('express');
 const morgan = require('morgan');
 const nunjucks = require('nunjucks');
 const bodyParser = require('body-parser');
+const models = require('./models');
+const chalk = require('chalk');
+
 
 const app = express();
 app.set('view engine', 'html');
@@ -21,6 +24,10 @@ app.get('/', (req, res, next) => {
 })
 
 const port = process.env.PORT || 3000;
-app.listen(port, () => {
-  console.log(`listening on port ${port}`);
-})
+
+models.db.sync({ force: true })
+  .then(() => {
+    app.listen(port, () => {
+      console.log(chalk.blue(`\nlistening on port ${port}`));
+    })
+  })
