@@ -5,7 +5,10 @@ const User = models.User;
 
 
 router.get('/', (req, res, next) => {
-	res.redirect('/');
+	Page.findAll({})
+	.then(pages=> {
+		res.render('index', { pages: pages });
+	}, next);
 })
 
 router.post('/', (req, res, next) => {
@@ -14,16 +17,28 @@ router.post('/', (req, res, next) => {
 		content: req.body.content
 	})
 
-	page.save().then(() => {
-		res.json(page);
-		// res.redirect('/');
-	}, err=> {
-		next(err);
-	})
+	page.save().then((savedPage) => {
+		// virtual route doesn't work?
+		// console.log(`virtual route `, savedPage.route);
+		res.redirect(`/wiki/${page.urlTitle}`);
+	}, next);
 })
 
 router.get('/add', (req, res, next) => {
 	res.render('addpage');
+})
+
+router.get('/:urlTitle', (req, res, next) => {
+	// req.params.urlTitle;
+	Page.findOne({
+		where: {
+			urlTitle: req.params.urlTitle
+		}
+	}).then(match=> {
+		if (!match) return res.render('error', { message: 'Bad page', error: new Error('Bad page')});
+		res.render('wikipage', { page: match });
+	}, next)
+	// res.render(`/wiki`);
 })
 
 
