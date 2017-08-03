@@ -1,6 +1,7 @@
 const express = require('express');
 const morgan = require('morgan');
 const nunjucks = require('nunjucks');
+const bodyParser = require('body-parser');
 
 const app = express();
 app.set('view engine', 'html');
