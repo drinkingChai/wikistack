@@ -29,7 +29,6 @@ router.get('/add', (req, res, next) => {
 })
 
 router.get('/:urlTitle', (req, res, next) => {
-	// req.params.urlTitle;
 	Page.findOne({
 		where: {
 			urlTitle: req.params.urlTitle
@@ -38,7 +37,6 @@ router.get('/:urlTitle', (req, res, next) => {
 		if (!match) return res.render('error', { message: 'Bad page', error: new Error('Bad page')});
 		res.render('wikipage', { page: match });
 	}, next)
-	// res.render(`/wiki`);
 })
 
 

@@ -2,6 +2,7 @@ var Sequelize = require('sequelize');
 var db = new Sequelize(process.env.DATABASE_URL);
 
 // helper
+// change name, should generate unique strings as well if url already exists
 const urlize = (text) => {
 	return !text ? text : text.replace(/[^\w\s]/g, '').replace(/\s+/g, '_');
 }
@@ -19,6 +20,7 @@ const Page = db.define('page', {
 	urlTitle: {
 		type: Sequelize.STRING,
 		allowNull: false,
+		unique: true,
 		get() {
 			return this.getDataValue('urlTitle');
 		}

@@ -33,12 +33,5 @@ models.db.sync({ force: true, logging: false })
   .then(() => {
     app.listen(port, () => {
       console.log(chalk.blue(`\nlistening on port ${port}`));
-      // test
-      // models.Page.create({
-      // 	title: "I'm a little    coconut, short, and stout",
-      // 	content: 'stuff'
-      // }).then(page => {
-      // 	console.log(page.get('urlTitle'));
-      // })
     })
   })
