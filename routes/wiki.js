@@ -14,7 +14,8 @@ router.get('/', (req, res, next) => {
 router.post('/', (req, res, next) => {
 	var page = Page.build({
 		title: req.body.title,
-		content: req.body.content
+		content: req.body.content,
+		tags: req.body.tags
 	})
 
 	User.findOrCreate({
@@ -38,6 +39,18 @@ router.get('/add', (req, res, next) => {
 	res.render('addpage');
 })
 
+router.get('/search', (req, res, next)=> {
+	Page.findByTag(req.query['tags']).then(pages=> {
+		res.render('index', { pages });
+	}, next);
+})
+
+router.get('/:urlTitle/similar', (req, res, next)=> {
+	Page.findSimilar(req.params.urlTitle).then(pages=> {
+		res.render('index', { pages });
+	}, next);
+})
+
 router.get('/:urlTitle', (req, res, next) => {
 	Page.findOne({
 		where: {
@@ -51,6 +64,7 @@ router.get('/:urlTitle', (req, res, next) => {
 		res.render('wikipage', { page, user: page.user });
 	}, next)
 })
+
 
 
 module.exports = router;

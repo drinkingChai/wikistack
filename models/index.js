@@ -35,6 +35,18 @@ const Page = db.define('page', {
 	date: {
 		type: Sequelize.DATE,
 		defaultValue: Sequelize.NOW
+	},
+	tags: {
+		type: Sequelize.ARRAY(Sequelize.STRING),
+		defaultValue: [],
+		get() {
+			// return this.getDataValue('tags').join(' ');
+			return this.getDataValue('tags');
+		},
+		set(tagstr) {
+			// middleware will send null if the string is empty..
+			if (tagstr) this.setDataValue('tags', tagstr.split(' '));
+		}
 	}
 }, {
 	getterMethods: {
@@ -43,6 +55,28 @@ const Page = db.define('page', {
 		}
 	}
 })
+
+Page.findByTag = tags=> {
+	return Page.findAll({
+		attributes: [ 'urlTitle', 'title' ],
+		where: { tags: { $overlap: tags.split(' ') }}
+	});
+};
+
+Page.findSimilar = urlTitle=> {
+	return Page.findOne({
+		attributes: [ 'tags' ],
+		where: { urlTitle: urlTitle }
+	}).then(page=> {
+		return Page.findAll({
+			attributes: [ 'urlTitle', 'title' ],
+			where: {
+				tags: { $overlap: page.tags },
+				urlTitle: { $ne: urlTitle }
+			}
+		})
+	})
+}
 
 const User = db.define('user', {
 	name: {

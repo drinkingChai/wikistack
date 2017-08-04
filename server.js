@@ -31,7 +31,29 @@ const port = process.env.PORT || 3000;
 
 models.db.sync({ force: true, logging: false })
   .then(() => {
-    app.listen(port, () => {
-      console.log(chalk.blue(`\nlistening on port ${port}`));
-    })
+  	// some test pages
+  	models.User.create({
+  		name: 'John Smith',
+  		email: 'john@john.com'
+  	}).then(user=> {
+	  	return models.Page.create({
+	  		title: 'Test Page',
+	  		content: 'Cool Stuff',
+	  		tags: 'very cool stuff'
+	  	}).then(page=> {
+	  		page.setUser(user)
+	  	}).then(() => {
+	  		return models.Page.create({
+		  		title: 'Test Page 2',
+		  		content: 'Cool Stuff',
+		  		tags: 'very awesome'
+		  	})
+	  	}).then(page=> {
+	  		page.setUser(user)
+	  	})
+  	}).then(()=> {
+	    app.listen(port, () => {
+	      console.log(chalk.blue(`\nlistening on port ${port}`));
+    	})
+  	})
   })
