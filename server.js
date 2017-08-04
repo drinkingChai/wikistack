@@ -10,11 +10,12 @@ const chalk = require('chalk');
 const app = express();
 app.set('view engine', 'html');
 app.engine('html', nunjucks.render);
-nunjucks.configure('views', {
+var env = nunjucks.configure('views', {
   express: app,
   noCache: true
 })
-
+var AutoEscapeExtension = require("nunjucks-autoescape")(nunjucks);
+env.addExtension('AutoEscapeExtension', new AutoEscapeExtension(env));
 
 app.use(express.static('public'));
 app.use(morgan('dev'));
@@ -38,14 +39,14 @@ models.db.sync({ force: true, logging: false })
   	}).then(user=> {
 	  	return models.Page.create({
 	  		title: 'Test Page',
-	  		content: 'Cool Stuff',
+	  		content: 'Cool Stuff [[Test Page 2]]',
 	  		tags: 'very cool stuff'
 	  	}).then(page=> {
 	  		page.setUser(user)
 	  	}).then(() => {
 	  		return models.Page.create({
 		  		title: 'Test Page 2',
-		  		content: 'Cool Stuff',
+		  		content: 'Cool Stuff [[Unknown Page]] and [[Test Page 1]]',
 		  		tags: 'very awesome'
 		  	})
 	  	}).then(page=> {

@@ -10,7 +10,11 @@
   </div>
   <hr/>
   <div>PLACEHOLDER AUTHOR NAME WITH LINK TO AUTHOR PAGE</div>
-  <div class="page-body">{{page.content}}</div>
+  <div class="page-body">
+	  {% autoescape false %}
+	  {{page.renderedContent}}
+	  {% endautoescape %}
+  </div>
   <hr/>
   <a href="{{page.urlTitle}}/edit" class="btn btn-primary">edit this page</a>
   <a href="{{page.urlTitle}}/delete" class="btn btn-danger">delete this page</a>

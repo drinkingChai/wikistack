@@ -1,4 +1,5 @@
-var Sequelize = require('sequelize');
+const Sequelize = require('sequelize');
+const marked = require('marked');
 var db = new Sequelize(process.env.DATABASE_URL);
 
 // helper
@@ -52,6 +53,16 @@ const Page = db.define('page', {
 	getterMethods: {
 		route() {
 			return `/wiki/${this.getDataValue('urlTitle')}`;
+		},
+		renderedContent() {
+			// detect [[ ]]
+			// find matching page title
+			// replace with (text)[/wiki/urlTitle]
+			// fix!
+			var content = this.getDataValue('content').replace(/\[\[(.*?)\]\]/g, substr=> {
+				console.log(substr);
+			})
+			return marked(content);
 		}
 	}
 })
