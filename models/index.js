@@ -4,8 +4,8 @@ var db = new Sequelize(process.env.DATABASE_URL);
 
 // helper
 const generateUrl = (text) => {
-	// generates unique-ish.. url
-	return !text ? text : `${text.replace(/[^\w\s]/g, '').replace(/\s+/g, '_')}_${Math.floor(Math.random() * 5000)}`;
+	// making titles unique....
+	return !text ? text : `${text.replace(/[^\w\s]/g, '').replace(/\s+/g, '_')}`;
 }
 
 
@@ -13,6 +13,7 @@ const Page = db.define('page', {
 	title: {
 		type: Sequelize.STRING,
 		allowNull: false,
+		unique: true,
 		set(val) {
 			this.setDataValue('title', val);
 			this.urlTitle = val;
@@ -55,12 +56,9 @@ const Page = db.define('page', {
 			return `/wiki/${this.getDataValue('urlTitle')}`;
 		},
 		renderedContent() {
-			// detect [[ ]]
-			// find matching page title
-			// replace with (text)[/wiki/urlTitle]
-			// fix!
 			var content = this.getDataValue('content').replace(/\[\[(.*?)\]\]/g, substr=> {
-				console.log(substr);
+				var title = `${substr.slice(2, substr.length - 2)}`;
+				return `[${title}](${generateUrl(title)})`;
 			})
 			return marked(content);
 		}

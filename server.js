@@ -46,7 +46,7 @@ models.db.sync({ force: true, logging: false })
 	  	}).then(() => {
 	  		return models.Page.create({
 		  		title: 'Test Page 2',
-		  		content: 'Cool Stuff [[Unknown Page]] and [[Test Page 1]]',
+		  		content: 'Cool Stuff [[Unknown Page]] and [[Test Page]]',
 		  		tags: 'very awesome'
 		  	})
 	  	}).then(page=> {
