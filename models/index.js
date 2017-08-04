@@ -2,9 +2,9 @@ var Sequelize = require('sequelize');
 var db = new Sequelize(process.env.DATABASE_URL);
 
 // helper
-// change name, should generate unique strings as well if url already exists
-const urlize = (text) => {
-	return !text ? text : text.replace(/[^\w\s]/g, '').replace(/\s+/g, '_');
+const generateUrl = (text) => {
+	// generates unique-ish.. url
+	return !text ? text : `${text.replace(/[^\w\s]/g, '').replace(/\s+/g, '_')}_${Math.floor(Math.random() * 5000)}`;
 }
 
 
@@ -19,16 +19,11 @@ const Page = db.define('page', {
 	},
 	urlTitle: {
 		type: Sequelize.STRING,
-		allowNull: false
+		allowNull: false,
+		set(val) {
+			this.setDataValue('urlTitle', generateUrl(val));
+		}
 	},
-	// urlTitle: {
-	// 	type: Sequelize.STRING,
-	// 	allowNull: false,
-	// 	unique: true,
-	// 	get() {
-	// 		return this.getDataValue('urlTitle');
-	// 	}
-	// },
 	content: {
 		type: Sequelize.TEXT,
 		allowNull: false
@@ -43,14 +38,8 @@ const Page = db.define('page', {
 	}
 }, {
 	getterMethods: {
-		urlTitle() {
-			console.log(`This is our url: ${this.getDataValue('urlTitle')}`);
-			return this.getDataValue('urlTitle');
-		}
-	},
-	setterMethods: {
-		urlTitle(val) {
-			this.setDataValue('urlTitle', urlize(this.getDataValue('title')));
+		route() {
+			return `/wiki/${this.getDataValue('urlTitle')}`;
 		}
 	}
 })
@@ -68,6 +57,9 @@ const User = db.define('user', {
 		}
 	},
 })
+
+Page.belongsTo(User);
+User.hasMany(Page);
 
 
 module.exports = {

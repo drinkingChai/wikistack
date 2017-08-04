@@ -17,12 +17,21 @@ router.post('/', (req, res, next) => {
 		content: req.body.content
 	})
 
-	page.save().then((savedPage) => {
-		// virtual route doesn't work?
-		// console.log(`virtual route `, savedPage.route);
-		console.log(page.urlTitle);
-		res.redirect(`/wiki/${page.urlTitle}`);
-	}, next);
+	User.findOrCreate({
+		where: {
+			email: req.body.email
+		}, defaults: {
+			name: req.body.author	
+		}
+	}).then(user=> {
+		return page.save().then(savedPage=> {
+			return page.setUser(user[0]);
+		});
+		return page.save();
+	}).then(savedPage=> {
+		res.redirect(savedPage.route);
+	}).catch(next);
+
 })
 
 router.get('/add', (req, res, next) => {
@@ -33,10 +42,13 @@ router.get('/:urlTitle', (req, res, next) => {
 	Page.findOne({
 		where: {
 			urlTitle: req.params.urlTitle
-		}
-	}).then(match=> {
-		if (!match) return res.render('error', { message: 'Bad page', error: new Error('Bad page')});
-		res.render('wikipage', { page: match });
+		},
+		include: [{
+			model: User
+		}]
+	}).then(page=> {
+		if (!page) return res.render('error', { message: 'Bad page', error: new Error('Bad page')});
+		res.render('wikipage', { page, user: page.user });
 	}, next)
 })
 
