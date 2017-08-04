@@ -20,6 +20,7 @@ router.post('/', (req, res, next) => {
 	page.save().then((savedPage) => {
 		// virtual route doesn't work?
 		// console.log(`virtual route `, savedPage.route);
+		console.log(page.urlTitle);
 		res.redirect(`/wiki/${page.urlTitle}`);
 	}, next);
 })

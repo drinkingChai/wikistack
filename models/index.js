@@ -14,17 +14,21 @@ const Page = db.define('page', {
 		allowNull: false,
 		set(val) {
 			this.setDataValue('title', val);
-			this.setDataValue('urlTitle', urlize(this.getDataValue('title')));
+			this.urlTitle = val;
 		}
 	},
 	urlTitle: {
 		type: Sequelize.STRING,
-		allowNull: false,
-		unique: true,
-		get() {
-			return this.getDataValue('urlTitle');
-		}
+		allowNull: false
 	},
+	// urlTitle: {
+	// 	type: Sequelize.STRING,
+	// 	allowNull: false,
+	// 	unique: true,
+	// 	get() {
+	// 		return this.getDataValue('urlTitle');
+	// 	}
+	// },
 	content: {
 		type: Sequelize.TEXT,
 		allowNull: false
@@ -36,6 +40,18 @@ const Page = db.define('page', {
 	date: {
 		type: Sequelize.DATE,
 		defaultValue: Sequelize.NOW
+	}
+}, {
+	getterMethods: {
+		urlTitle() {
+			console.log(`This is our url: ${this.getDataValue('urlTitle')}`);
+			return this.getDataValue('urlTitle');
+		}
+	},
+	setterMethods: {
+		urlTitle(val) {
+			this.setDataValue('urlTitle', urlize(this.getDataValue('title')));
+		}
 	}
 })
 
