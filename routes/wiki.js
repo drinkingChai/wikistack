@@ -1,6 +1,5 @@
 const router = require('express').Router();
 const models = require('../models');
-const toMarked = require('to-markdown');
 const Page = models.Page;
 const User = models.User;
 
@@ -23,7 +22,7 @@ router.post('/', (req, res, next) => {
 		where: {
 			email: req.body.email
 		}, defaults: {
-			name: req.body.author	
+			name: req.body.author
 		}
 	}).then(user=> {
 		return page.save().then(savedPage=> {
@@ -67,7 +66,6 @@ router.get('/:urlTitle/edit', (req, res, next) => {
 		}]
 	}).then(page=> {
 		if (!page) return res.render('error', { message: 'Bad page', error: new Error('Bad page')});
-		page.content = toMarked(page.content);
 		res.render('addpage', { page, user: page.user, method: `${req.params.urlTitle}?_method=PUT` });
 	}, next)
 })

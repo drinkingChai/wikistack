@@ -55,9 +55,8 @@ const Page = db.define('page', {
 			return `/wiki/${this.getDataValue('urlTitle')}`;
 		},
 		renderedContent() {
-			var content = this.getDataValue('content').replace(/\[\[(.*?)\]\]/g, substr=> {
-				var title = `${substr.slice(2, substr.length - 2)}`;
-				return `[${title}](${generateUrl(title)})`;
+			var content = this.getDataValue('content').replace(/\[\[(.*?)\]\]/g, (match, pageName)=> {
+				return `[${pageName}](${generateUrl(pageName)})`;
 			})
 			return marked(content);
 		}
@@ -67,7 +66,7 @@ const Page = db.define('page', {
 Page.findByTag = tags=> {
 	return Page.findAll({
 		attributes: [ 'urlTitle', 'title' ],
-		where: { tags: { $overlap: tags.split(' ') }}
+		where: { tags: { $overlap: tags.split(' ') }},
 	});
 };
 
