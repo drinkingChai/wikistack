@@ -72,12 +72,12 @@ Page.findByTag = tags=> {
 	});
 };
 
-Page.prototype.findSimilar = (urlTitle, tags)=> {
+Page.prototype.findSimilar = function() {
 	return Page.findAll({
 		attributes: [ 'urlTitle', 'title' ],
 		where: {
-			tags: { $overlap: tags },
-			urlTitle: { $ne: urlTitle }
+			tags: { $overlap: this.tags },
+			urlTitle: { $ne: this.urlTitle }
 		}
 	})
 }

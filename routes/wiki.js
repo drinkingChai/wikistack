@@ -47,10 +47,9 @@ router.get('/search', (req, res, next)=> {
 
 router.get('/:urlTitle/similar', (req, res, next)=> {
 	Page.findOne({
-		attributes: ['tags'],
 		where: { urlTitle: req.params.urlTitle }
 	}).then(page => {
-		return page.findSimilar(req.params.urlTitle, page.tags);
+		return page.findSimilar();
 	}).then(pages => {
 		res.render('index', { pages });
 	}).catch(next);
