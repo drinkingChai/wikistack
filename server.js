@@ -32,7 +32,7 @@ app.use((err, req, res, next) => {
 
 const port = process.env.PORT || 3000;
 
-models.db.sync({ force: true, logging: false })
+models.db.sync({ force: true })
   .then(() => {
   	// some test pages
   	return models.seed();

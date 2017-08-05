@@ -1,6 +1,8 @@
 const Sequelize = require('sequelize');
 const marked = require('marked');
-var db = new Sequelize(process.env.DATABASE_URL);
+var db = new Sequelize(process.env.DATABASE_URL, {
+	logging: false
+});
 
 // helper
 const generateUrl = (text) => {
