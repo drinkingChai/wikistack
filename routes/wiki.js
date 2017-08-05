@@ -76,9 +76,7 @@ router.put('/:urlTitle', (req, res, next) => {
 	// don't need to hold previous data
 	// the urlTitle can give the association ;)
 	Page.findOne({
-		where: {
-			urlTitle: req.params.urlTitle
-		},
+		where: { urlTitle: req.params.urlTitle },
 		include: [{
 			model: User
 		}]
@@ -100,7 +98,13 @@ router.put('/:urlTitle', (req, res, next) => {
 
 router.get('/:urlTitle/delete', (req, res, next) => {
 	// get request for delete :o
-	
+	Page.findOne({
+		where: { urlTitle: req.params.urlTitle }
+	}).then(page=> {
+		page.destroy();
+	}).then(()=> {
+		res.redirect('/wiki');
+	}).catch(next);
 })
 
 router.get('/:urlTitle', (req, res, next) => {
