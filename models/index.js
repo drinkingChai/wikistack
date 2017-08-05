@@ -42,7 +42,6 @@ const Page = db.define('page', {
 		type: Sequelize.ARRAY(Sequelize.STRING),
 		defaultValue: [],
 		get() {
-			// return this.getDataValue('tags').join(' ');
 			return this.getDataValue('tags');
 		},
 		set(tagstr) {
@@ -72,18 +71,13 @@ Page.findByTag = tags=> {
 	});
 };
 
-Page.findSimilar = urlTitle=> {
-	return Page.findOne({
-		attributes: [ 'tags' ],
-		where: { urlTitle: urlTitle }
-	}).then(page=> {
-		return Page.findAll({
-			attributes: [ 'urlTitle', 'title' ],
-			where: {
-				tags: { $overlap: page.tags },
-				urlTitle: { $ne: urlTitle }
-			}
-		})
+Page.prototype.findSimilar = (urlTitle, tags)=> {
+	return Page.findAll({
+		attributes: [ 'urlTitle', 'title' ],
+		where: {
+			tags: { $overlap: tags },
+			urlTitle: { $ne: urlTitle }
+		}
 	})
 }
 
@@ -107,6 +101,31 @@ User.hasMany(Page);
 
 module.exports = {
 	db,
+	seed,
 	Page,
 	User
+}
+
+// seed
+function seed() {
+	return User.create({
+		name: 'John Smith',
+		email: 'john@john.com'
+	}).then(user=> {
+  	return Page.create({
+  		title: 'Test Page',
+  		content: 'Cool Stuff [[Test Page 2]]',
+  		tags: 'very cool stuff'
+  	}).then(page=> {
+  		page.setUser(user)
+  	}).then(() => {
+  		return Page.create({
+	  		title: 'Test Page 2',
+	  		content: 'Cool Stuff [[Unknown Page]] and [[Test Page]]',
+	  		tags: 'very awesome'
+	  	})
+  	}).then(page=> {
+  		page.setUser(user)
+  	})
+	})
 }

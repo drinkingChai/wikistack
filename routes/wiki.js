@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const models = require('../models');
+const toMarked = require('to-markdown');
 const Page = models.Page;
 const User = models.User;
 
@@ -36,7 +37,7 @@ router.post('/', (req, res, next) => {
 })
 
 router.get('/add', (req, res, next) => {
-	res.render('addpage');
+	res.render('addpage', { page: {}, user: {}, method: '' });
 })
 
 router.get('/search', (req, res, next)=> {
@@ -46,9 +47,60 @@ router.get('/search', (req, res, next)=> {
 })
 
 router.get('/:urlTitle/similar', (req, res, next)=> {
-	Page.findSimilar(req.params.urlTitle).then(pages=> {
+	Page.findOne({
+		attributes: ['tags'],
+		where: { urlTitle: req.params.urlTitle }
+	}).then(page => {
+		return page.findSimilar(req.params.urlTitle, page.tags);
+	}).then(pages => {
 		res.render('index', { pages });
-	}, next);
+	}).catch(next);
+})
+
+router.get('/:urlTitle/edit', (req, res, next) => {
+	Page.findOne({
+		where: {
+			urlTitle: req.params.urlTitle
+		},
+		include: [{
+			model: User
+		}]
+	}).then(page=> {
+		if (!page) return res.render('error', { message: 'Bad page', error: new Error('Bad page')});
+		page.content = toMarked(page.content);
+		res.render('addpage', { page, user: page.user, method: `${req.params.urlTitle}?_method=PUT` });
+	}, next)
+})
+
+router.put('/:urlTitle', (req, res, next) => {
+	// don't need to hold previous data
+	// the urlTitle can give the association ;)
+	Page.findOne({
+		where: {
+			urlTitle: req.params.urlTitle
+		},
+		include: [{
+			model: User
+		}]
+	}).then(page=> {
+		return page.update({
+			title: req.body.title,
+			content: req.body.content,
+			tags: req.body.tags
+		}).then(updatedPage=> {
+			page.user.update({
+				name: req.body.author,
+				email: req.body.email
+			}).then(()=> {
+				res.redirect(updatedPage.route);
+			})
+		});
+	}).catch(next);
+})
+
+router.get('/:urlTitle/delete', (req, res, next) => {
+	// get request for delete :o
+	
 })
 
 router.get('/:urlTitle', (req, res, next) => {
